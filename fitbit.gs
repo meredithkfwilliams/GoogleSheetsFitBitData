@@ -1,7 +1,5 @@
-// This script will pull down your fitbit data
-// and push it into a spreadsheet
+// This Google Apps script will pull down your fitbit data and push it into a Google spreadsheet
 // Units are metric (kg, km) unless otherwise noted
-// Suggestions/comments/improvements?  Let me know loghound@gmail.com
 //
 //
 /**** Length of time to look at.
