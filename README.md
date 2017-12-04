@@ -2,7 +2,7 @@
 
 I've consolidated code found elsewhere that wasn't being updated anymore (since 2015) to pull down personal data from the FitBit API to Google Sheets. 
 
-Specifically, I used it from this: https://github.com/loghound/Fitbit-for-Google-App-Script I'm also working on merging in the outstanding pull requests that are languishing, and I'll try to update the Google OAuth so you can use the latest version instead of being time-warped in version 19.  
+Specifically, I used it from this: https://github.com/loghound/Fitbit-for-Google-App-Script I've added in two of three outstanding pull requests (the one remaining is the nutritional values), and I'll try to update the Google OAuth so you can use the latest version instead of being time-warped in version 19.  
 
 For now, here's the (overly) detailed steps to get this going, assuming you've done nothing to start:
 
@@ -49,3 +49,6 @@ For now, here's the (overly) detailed steps to get this going, assuming you've d
 1. Pull down data
    * On the spreadsheet, go to *FitBit -> refresh Tidbit Time data*
    * Watch in awe as data populates on the sheet
+   
+1. OPTIONAL - Set up a trigger for your script to run periodically
+   * Script editor --> Resources --> All your triggers --> Add a new trigger for "refreshTimeSeries"
