@@ -497,7 +497,7 @@ function findRow(date, doc) {
   cell = cell.offset(ct, 0);
   // If the cell we found has a newer date than ours, we need to
   // insert a new row right before that.
-  if (cell_date > date) {
+  if (cell.getValue() > date) {
     doc.insertRowBefore(cell.getRow())
   }
   // return only the number of the row.
