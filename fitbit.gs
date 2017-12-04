@@ -1,5 +1,7 @@
-// This Google Apps script will pull down your fitbit data and push it into a Google spreadsheet
+// This script will pull down your fitbit data
+// and push it into a spreadsheet
 // Units are metric (kg, km) unless otherwise noted
+// Suggestions/comments/improvements?  Let me know loghound@gmail.com
 //
 //
 /**** Length of time to look at.
@@ -37,12 +39,14 @@ var PROJECT_KEY_PROPERTY_NAME = "projectKey";
  * @const
  */
 var LOGGABLES = [ "activities/log/steps", "activities/log/distance",
+    "activities/log/floors",
     "activities/log/activeScore", "activities/log/activityCalories",
     "activities/log/calories", "foods/log/caloriesIn",
     "activities/log/minutesSedentary",
     "activities/log/minutesLightlyActive",
     "activities/log/minutesFairlyActive",
     "activities/log/minutesVeryActive", "sleep/timeInBed",
+    "sleep/minutesToFallAsleep", "sleep/startTime",
     "sleep/minutesAsleep", "sleep/minutesAwake", "sleep/awakeningsCount",
     "body/weight", "body/bmi", "body/fat" ];
 
@@ -98,7 +102,9 @@ function refreshTimeSeries() {
       var options = {
         "method" : "GET",
         "headers": {
-          "Authorization": "Bearer " + service.getAccessToken()
+          "Authorization": "Bearer " + service.getAccessToken(),
+          // Request the units based on the user's locale.
+          "Accept-Language": user.locale
         }
       };
 
@@ -144,7 +150,13 @@ function refreshTimeSeries() {
         // Insert Date into first column
         doc.getActiveSheet().getRange(row_index, 1).setValue(val["dateTime"]);
         // Insert value
-        doc.getActiveSheet().getRange(row_index, 2 + activity * 1.0).setValue(Number(val["value"]));
+        cell = doc.getActiveSheet().getRange(row_index, 2 + activity * 1.0);
+        if (title == "startTime") {
+          // values that are not numeric
+          cell.setValue(val["value"]);
+        } else {
+          cell.setValue(Number(val["value"]));
+        }
       }
     }
   }
@@ -357,7 +369,7 @@ function getService() {
       .setProjectKey(getProjectKey())
       .setCallbackFunction('fitbitAuthCallback')
       .setPropertyStore(PropertiesService.getScriptProperties())
-      .setScope('activity nutrition sleep weight profile settings')
+      .setScope('activity')
       .setTokenHeaders({
         'Authorization': 'Basic ' + Utilities.base64Encode(getConsumerKey() + ':' + getConsumerSecret())
       });
@@ -423,17 +435,23 @@ function onInstall() {
 
 // Find the right row for a date.
 function findRow(date) {
+  // Zero out the hours / minutes / seconds / ms if set
+  date = date.setHours(0, 0, 0, 0);
   var doc = SpreadsheetApp.getActiveSpreadsheet();
   var cell = doc.getRange("A3");
 
+  var cell_date = new Date(cell.getValue())
+  cell_date.setHours(0, 0, 0, 0);
   // Find the first cell in first column which is either empty,
   // or has an equal or bigger date than the one we are looking for.
-  while ((cell.getValue() != "") && (cell.getValue() < date)) {
+  while ((cell.getValue() != "") && (cell_date < date)) {
     cell = cell.offset(1,0);
+    cell_date = new Date(cell.getValue())
+    cell_date.setHours(0, 0, 0, 0);
   }
   // If the cell we found has a newer date than ours, we need to
   // insert a new row right before that.
-  if (cell.getValue() > date) {
+  if (cell_date > date) {
     doc.insertRowBefore(cell.getRow())
   }
   // return only the number of the row.
