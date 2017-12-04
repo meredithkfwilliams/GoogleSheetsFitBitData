@@ -8,17 +8,17 @@ For now, here's the (overly) detailed steps to get this going, assuming you've d
 
 1. Create a new Google Spreadsheet
 1. Set up the fitbit.gs code in Script Editor
-   * Go to Tools -> Script Editor
+   * Go to *Tools -> Script Editor*
    * Replace the code.gs with fitbit.gs and save
 
 1. Add the OAuth Library in Script Editor (Documented here: https://github.com/googlesamples/apps-script-oauth2/tree/0e7bcd464962321a75ccb97256d5373b27c4c2e1#setup)
-   * Go to to Resources -> Libraries...
-   * In the "Find a Library" text box, enter the project key "MswhXl8fVhTFUH_Q3UOJbXvxhMjh3Sh48" and click the "Select" button.
-   * Choose choose version 19 in the Version dropdown. Click Save.
+   * Go to to *Resources -> Libraries...*
+   * In the **Find a Library** text box, enter the project key *MswhXl8fVhTFUH_Q3UOJbXvxhMjh3Sh48* and select the OAuth library
+   * Choose choose version 19 in the Version dropdown and save
 
 1. Get Information About the Project
-   * Go to File -> Project Properties
-   * Under the Info tab, make note of the value in Project Key (Deprecated)
+   * Go to *File -> Project Properties*
+   * Under the Info tab, make note of the value in **Project Key (Deprecated)**
   
 1. Assemble your Redirect URI (Documented here: https://github.com/googlesamples/apps-script-oauth2/tree/0e7bcd464962321a75ccb97256d5373b27c4c2e1#redirect-uri)
    * Add your project key from above step to this URL https://script.google.com/macros/d/{PROJECT KEY}/usercallback
@@ -34,18 +34,18 @@ For now, here's the (overly) detailed steps to get this going, assuming you've d
  
 1. Configure Spreadsheet
    * Navigate back to your Google spreadsheet itself and refresh. A new FitBit menu item should appear in the bar.
-   * Go to FitBit -> Configure 
+   * Go to *FitBit -> Configure*
    * Enter the FitBit Client ID, FitBit Client Secret, and Google Project ID
    * Select the resources you want and the time period you want
    * Ignore the paragraph of text before the options, these steps were covered in what I wrote out above
    * Save Configuration
   
 1. Authorize the Application
-   * Still on the spreadsheet, go to FitBit -> Authorize
+   * Still on the spreadsheet, go to *FitBit -> Authorize*
    * Side bar will open on the sheet. Click the link to Authorize.
    * Accept the FitBit scope authorization in the new window
    * Close and return to the spreadsheet
 
 1. Pull down data
-   * On the spreadsheet, go to FitBit -> refresh Tidbit Time data
+   * On the spreadsheet, go to *FitBit -> refresh Tidbit Time data*
    * Watch in awe as data populates on the sheet
