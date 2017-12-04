@@ -89,7 +89,7 @@ function refreshTimeSeries() {
   Logger.log('Refreshing timeseries data...');
   var user = authorize().user;
   Logger.log(user)
-  var ss = SpreadsheetApp.openById(sheet_id);
+  var ss = SpreadsheetApp.openById(getSheetId());
   var doc = ss.getSheetByName(sheet_name);
   doc.setFrozenRows(2);
   // header rows
@@ -203,6 +203,8 @@ function setConsumerKey(key) {
   scriptProperties.setProperty(CLIENT_ID_PROPERTY_NAME, key);
 }
 
+
+
 /**
  * @return String Project key
  */
@@ -213,6 +215,17 @@ function getProjectKey() {
   }
   return key;
 }
+
+/**
+  * @return String Project key
+  */
+ function getSheetId() {
+   var key = scriptProperties.getProperty(CLIENT_SHEET_ID);
+   if (key == null) {
+     key = "";
+   }
+   return key;
+ }
 
 /**
  * @param String Project key
@@ -280,6 +293,7 @@ function saveConfiguration(e) {
     setConsumerKey(e.parameter.clientID);
     setConsumerSecret(e.parameter.consumerSecret);
     setProjectKey(e.parameter.projectKey);
+    scriptProperties.setProperty(CLIENT_SHEET_ID, e.parameter.sheetId);
     setLoggables(e.parameter.loggables);
     setPeriod(e.parameter.period);
     var app = UiApp.getActiveApplication();
@@ -294,7 +308,7 @@ function renderFitbitConfigurationDialog() {
   var doc = SpreadsheetApp.getActiveSpreadsheet();
   var app = UiApp.createApplication().setTitle("Configure Fitbit");
   app.setStyleAttribute("padding", "10px");
-  app.setHeight('380');
+  app.setHeight('460');
 
   var helpLabel = app
        .createLabel("From here you will configure access to fitbit -- Just supply your own"
@@ -323,17 +337,34 @@ function renderFitbitConfigurationDialog() {
   projectKey.setWidth("100%");
   projectKey.setText(getProjectKey());
 
+  var sheetIdLabel = app.createLabel("Sheet ID:");
+  var sheetId = app.createTextBox();
+  sheetId.setName("sheetId");
+  sheetId.setWidth("100%");
+  sheet_id = getSheetId();
+  if (!sheet_id) {
+    try {
+      sheet_id = SpreadsheetApp.getActiveSpreadsheet().getId();
+    }
+    catch (e) {
+      Logger.log("Could not get the Sheet ID.");
+    }
+  }
+  sheetId.setText(sheet_id);
+
   var saveHandler = app.createServerClickHandler("saveConfiguration");
   var saveButton = app.createButton("Save Configuration", saveHandler);
 
-  var listPanel = app.createGrid(6, 3);
+  var listPanel = app.createGrid(7, 2);
   listPanel.setWidget(1, 0, consumerKeyLabel);
   listPanel.setWidget(1, 1, consumerKey);
   listPanel.setWidget(2, 0, consumerSecretLabel);
   listPanel.setWidget(2, 1, consumerSecret);
   listPanel.setWidget(3, 0, projectKeyLabel);
   listPanel.setWidget(3, 1, projectKey);
-
+  listPanel.setWidget(4, 0, sheetIdLabel);
+  listPanel.setWidget(4, 1, sheetId);	
+  
   // add checkboxes to select loggables
   var loggables = app.createListBox(true).setId("loggables").setName("loggables");
   loggables.setVisibleItemCount(3);
@@ -344,8 +375,8 @@ function renderFitbitConfigurationDialog() {
 			loggables.setItemSelected(parseInt(resource), true);
 		}
   }
-  listPanel.setWidget(4, 0, app.createLabel("Resources:"));
-  listPanel.setWidget(4, 1, loggables);
+  listPanel.setWidget(5, 0, app.createLabel("Resources:"));
+  listPanel.setWidget(5, 1, loggables);
 
   var period = app.createListBox(false).setId("period").setName("period");
   period.setVisibleItemCount(1);
@@ -354,8 +385,8 @@ function renderFitbitConfigurationDialog() {
     period.addItem(PERIODS[resource]);
   }
   period.setSelectedIndex(PERIODS.indexOf(getPeriod()));
-  listPanel.setWidget(5, 0, app.createLabel("Period:"));
-  listPanel.setWidget(5, 1, period);
+  listPanel.setWidget(6, 0, app.createLabel("Period:"));
+  listPanel.setWidget(6, 1, period);
 
   // Ensure that all form fields get sent along to the handler
   saveHandler.addCallbackElement(listPanel);
