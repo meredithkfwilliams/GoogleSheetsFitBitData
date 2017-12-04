@@ -175,7 +175,6 @@ function refreshTimeSeries() {
         
         doc.getRange(row_index, 2 + activity * 1.0).setValue(formattedValue);
         Logger.log("Done with " + activity);
-        }
       }
     }
   }
