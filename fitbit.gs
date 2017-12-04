@@ -28,6 +28,12 @@ var CONSUMER_SECRET_PROPERTY_NAME = "fitbitConsumerSecret";
  */
 var PROJECT_KEY_PROPERTY_NAME = "projectKey";
 
+/**
+ * Sheet ID.
+ * @type {String}
+ * @const
+ */
+var CLIENT_SHEET_ID = "sheetId";
 
 /**
  * Default loggable resources.
@@ -35,17 +41,25 @@ var PROJECT_KEY_PROPERTY_NAME = "projectKey";
  * @type String[]
  * @const
  */
-var LOGGABLES = [ "activities/log/steps", "activities/log/distance",
-    "activities/log/floors",
-    "activities/log/activeScore", "activities/log/activityCalories",
-    "activities/log/calories", "foods/log/caloriesIn",
-    "activities/log/minutesSedentary",
-    "activities/log/minutesLightlyActive",
-    "activities/log/minutesFairlyActive",
-    "activities/log/minutesVeryActive", "sleep/timeInBed",
-    "sleep/minutesToFallAsleep", "sleep/startTime",
-    "sleep/minutesAsleep", "sleep/minutesAwake", "sleep/awakeningsCount",
-    "body/weight", "body/bmi", "body/fat" ];
+var LOGGABLES = [ "activities/log/steps", 
+		 "activities/log/distance",
+		 "activities/log/activeScore", 
+		 "activities/log/activityCalories",
+		 "activities/log/calories", 
+		 "foods/log/caloriesIn",
+		 "activities/log/minutesSedentary",
+		 "activities/log/minutesLightlyActive",
+		 "activities/log/minutesFairlyActive",
+		 "activities/log/minutesVeryActive",
+		 "sleep/timeInBed",
+		 "sleep/minutesAsleep", 
+		 "sleep/minutesAwake", 
+		 "sleep/awakeningsCount",
+		 "sleep/efficiency",
+		 "activities/heart",
+		 "body/weight", 
+		 "body/bmi", 
+		 "body/fat" ];
 
 /**
  * Default fetchable periods.
@@ -62,6 +76,8 @@ var PERIODS = [ "1d", "7d", "30d", "1w", "1m", "3m", "6m", "1y", "max" ];
  */
 var scriptProperties = PropertiesService.getScriptProperties();
 
+var sheet_name = "FitBit Data Import"; //Change this if you want to rename your sheet!
+
 function refreshTimeSeries() {
 
   // if the user has never configured ask him to do it here
@@ -73,7 +89,8 @@ function refreshTimeSeries() {
   Logger.log('Refreshing timeseries data...');
   var user = authorize().user;
   Logger.log(user)
-  var doc = SpreadsheetApp.getActiveSpreadsheet()
+  var ss = SpreadsheetApp.openById(sheet_id);
+  var doc = ss.getSheetByName(sheet_name);
   doc.setFrozenRows(2);
   // header rows
   doc.getRange("a1").setValue(user.displayName);
@@ -142,17 +159,22 @@ function refreshTimeSeries() {
         if ( row_index != 0 ) {
           row_index++;
         } else {
-          row_index = findRow(date);
+          row_index = findRow(date, doc);
         }
         // Insert Date into first column
-        doc.getActiveSheet().getRange(row_index, 1).setValue(val["dateTime"]);
-        // Insert value
-        cell = doc.getActiveSheet().getRange(row_index, 2 + activity * 1.0);
-        if (title == "startTime") {
-          // values that are not numeric
-          cell.setValue(val["value"]);
-        } else {
-          cell.setValue(Number(val["value"]));
+         doc.getRange(row_index, 1).setValue(val["dateTime"]);
+       // Insert value
+        var formattedValue = Number(val["value"]);
+        
+        Logger.log("Title: " + title);
+        // This is heart rate data
+        if ( val.value["restingHeartRate"] !== undefined) {
+          
+          formattedValue = Number(val.value["restingHeartRate"]);
+        }
+        
+        doc.getRange(row_index, 2 + activity * 1.0).setValue(formattedValue);
+        Logger.log("Done with " + activity);
         }
       }
     }
@@ -366,7 +388,7 @@ function getService() {
       .setProjectKey(getProjectKey())
       .setCallbackFunction('fitbitAuthCallback')
       .setPropertyStore(PropertiesService.getScriptProperties())
-      .setScope('activity')
+      .setScope('activity nutrition sleep weight profile settings')
       .setTokenHeaders({
         'Authorization': 'Basic ' + Utilities.base64Encode(getConsumerKey() + ':' + getConsumerSecret())
       });
@@ -431,21 +453,18 @@ function onInstall() {
 }
 
 // Find the right row for a date.
-function findRow(date) {
-  // Zero out the hours / minutes / seconds / ms if set
-  date = date.setHours(0, 0, 0, 0);
-  var doc = SpreadsheetApp.getActiveSpreadsheet();
+function findRow(date, doc) {
   var cell = doc.getRange("A3");
+  var column = doc.getRange('A:A');
+  var values = column.getValues(); // get all data in one call
+  var ct = 0;
 
-  var cell_date = new Date(cell.getValue())
-  cell_date.setHours(0, 0, 0, 0);
   // Find the first cell in first column which is either empty,
   // or has an equal or bigger date than the one we are looking for.
-  while ((cell.getValue() != "") && (cell_date < date)) {
-    cell = cell.offset(1,0);
-    cell_date = new Date(cell.getValue())
-    cell_date.setHours(0, 0, 0, 0);
+  while ( (values[ct][0] != "") && values[ct][0] < date ) {
+    ct++;
   }
+  cell = cell.offset(ct, 0);
   // If the cell we found has a newer date than ours, we need to
   // insert a new row right before that.
   if (cell_date > date) {
