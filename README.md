@@ -26,11 +26,11 @@ For now, here's the (overly) detailed steps to get this going, assuming you've d
 1. Set up your FitBit Dev Credentials (if you haven't already)
    * In a new tab, log into FitBit dev site with your FitBit credentials: https://dev.fitbit.com/apps/new
    * Fill in whatever you want for App Name, Description, Website, Organization and Organization Website (the two websites do need to have full URL, such as http://www.example.com but the URLs themselves don't matter)
-  * Select 'Personal' for OAuth 2.0 Application Type
-  * For the Callback URL, enter the URL you put together with your project key (https://script.google.com/macros/d/{PROJECT KEY}/usercallback)
-  * Select 'Read-Only' for Default Access Type
-  * Agree to Terms of Service and click Register
-  * Make note of the FitBit Cliend ID and FitBit Client Secret
+   * Select 'Personal' for OAuth 2.0 Application Type
+   * For the Callback URL, enter the URL you put together with your project key (https://script.google.com/macros/d/{PROJECT KEY}/usercallback)
+   * Select 'Read-Only' for Default Access Type
+   * Agree to Terms of Service and click Register
+   * Make note of the FitBit Cliend ID and FitBit Client Secret
  
 1. Configure Spreadsheet
    * Navigate back to your Google spreadsheet itself and refresh. A new FitBit menu item should appear in the bar.
