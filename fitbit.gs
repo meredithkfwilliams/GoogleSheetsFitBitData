@@ -41,25 +41,30 @@ var CLIENT_SHEET_ID = "sheetId";
  * @type String[]
  * @const
  */
-var LOGGABLES = [ "activities/log/steps", 
+var LOGGABLES = ["activities/log/calories", 
+		 "activities/log/steps", 
+		 "activities/log/floors",
 		 "activities/log/distance",
+		 "activities/log/elevation",
 		 "activities/log/activeScore", 
 		 "activities/log/activityCalories",
-		 "activities/log/calories", 
-		 "foods/log/caloriesIn",
 		 "activities/log/minutesSedentary",
 		 "activities/log/minutesLightlyActive",
 		 "activities/log/minutesFairlyActive",
 		 "activities/log/minutesVeryActive",
+		 "activities/heart"
 		 "sleep/timeInBed",
 		 "sleep/minutesAsleep", 
 		 "sleep/minutesAwake", 
 		 "sleep/awakeningsCount",
-		 "sleep/efficiency",
-		 "activities/heart",
+		 "sleep/efficiency"
+		 "sleep/duration",
+		 "sleep/isMainSleep",
 		 "body/weight", 
 		 "body/bmi", 
-		 "body/fat" ];
+		 "body/fat",
+		 "foods/log/caloriesIn",
+		 "foods/log/water"];
 
 /**
  * Default fetchable periods.
